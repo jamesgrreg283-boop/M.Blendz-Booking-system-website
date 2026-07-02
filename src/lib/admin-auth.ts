@@ -9,7 +9,8 @@ function getSecret(): string {
 }
 
 export function getAdminPassword(): string {
-  return process.env.ADMIN_PASSWORD || "";
+  // Set ADMIN_PASSWORD in production env for a custom password
+  return process.env.ADMIN_PASSWORD || "admin";
 }
 
 export function createAdminSessionToken(): string {
