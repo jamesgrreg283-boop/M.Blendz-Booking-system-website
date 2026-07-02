@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { BUSINESS_NAME, BUSINESS_TAGLINE } from "@/lib/constants";
 import { staggerContainer, fadeUp } from "@/lib/motion";
@@ -34,20 +33,11 @@ export function Hero() {
           variants={staggerContainer}
           className="max-w-2xl"
         >
-          <motion.div variants={fadeUp} className="mb-6 flex items-center gap-4">
-            <Image
-              src="/logo.png"
-              alt={BUSINESS_NAME}
-              width={56}
-              height={56}
-              className="rounded-full"
-            />
-            <div>
-              <p className="text-sm font-medium uppercase tracking-[0.2em] text-primary">
-                {BUSINESS_NAME}
-              </p>
-              <p className="text-xs text-muted-foreground">{BUSINESS_TAGLINE}</p>
-            </div>
+          <motion.div variants={fadeUp} className="mb-6">
+            <p className="text-sm font-medium uppercase tracking-[0.2em] text-primary">
+              {BUSINESS_NAME}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{BUSINESS_TAGLINE}</p>
           </motion.div>
 
           <h1 className="text-balance text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-6xl">

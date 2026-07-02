@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -44,15 +43,8 @@ export function Header() {
       <div className="container-narrow mx-auto flex h-16 items-center justify-between px-5 md:px-8">
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80"
+          className="text-lg font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80"
         >
-          <Image
-            src="/logo.png"
-            alt={BUSINESS_NAME}
-            width={32}
-            height={32}
-            className="rounded-full"
-          />
           {BUSINESS_NAME}
         </Link>
 
