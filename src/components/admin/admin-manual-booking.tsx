@@ -141,7 +141,7 @@ export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
                   setForm({ ...form, service: s.id, time: "" })
                 }
                 className={cn(
-                  "flex w-full items-center justify-between border p-3 text-left text-sm",
+                  "flex min-h-12 w-full items-center justify-between border p-4 text-left text-sm active:scale-[0.99]",
                   form.service === s.id
                     ? "border-primary bg-primary/5"
                     : "border-border"
@@ -162,7 +162,7 @@ export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
             onChange={(e) =>
               setForm({ ...form, date: e.target.value, time: "" })
             }
-            className="flex h-11 w-full rounded-sm border border-input bg-card px-4 text-sm"
+            className="flex h-12 w-full rounded-sm border border-input bg-card px-4 text-base sm:text-sm"
             required
           >
             <option value="">Select date</option>
@@ -188,14 +188,14 @@ export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
                 No slots available for this date.
               </p>
             ) : (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {slots.map((slot) => (
                   <button
                     key={slot}
                     type="button"
                     onClick={() => setForm({ ...form, time: slot })}
                     className={cn(
-                      "border p-2 text-center text-xs",
+                      "touch-target border p-2.5 text-center text-sm active:scale-[0.98]",
                       form.time === slot
                         ? "border-primary bg-primary/5"
                         : "border-border"
@@ -227,7 +227,7 @@ export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
         <Button
           type="submit"
           disabled={submitting || !form.time}
-          className="w-full sm:w-auto"
+          className="h-12 w-full text-base"
         >
           {submitting ? (
             <Loader2 className="animate-spin" size={16} />

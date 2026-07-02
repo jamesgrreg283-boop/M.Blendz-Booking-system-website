@@ -63,6 +63,10 @@
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 
+  .pb-safe {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+  }
+
   .mobile-main-pad {
     padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
   }

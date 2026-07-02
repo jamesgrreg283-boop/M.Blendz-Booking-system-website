@@ -12,7 +12,7 @@ export default function AdminPage() {
 
   if (authenticated === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-[100dvh] items-center justify-center pb-safe">
         <Loader2 className="animate-spin text-primary" size={32} />
       </div>
     );

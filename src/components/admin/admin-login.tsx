@@ -42,8 +42,8 @@ export function AdminLogin({ onSuccess }: AdminLoginProps) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-5">
-      <div className="w-full max-w-sm border border-border bg-card p-8">
+    <div className="flex min-h-[100dvh] items-center justify-center px-4 py-8 pb-safe">
+      <div className="w-full max-w-sm border border-border bg-card p-6 sm:p-8">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
             <Lock className="text-primary" size={20} />
@@ -62,17 +62,20 @@ export function AdminLogin({ onSuccess }: AdminLoginProps) {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter admin password"
               autoComplete="current-password"
+              className="h-12"
               required
             />
           </div>
 
-          {error && (
-            <p className="text-sm text-red-400">{error}</p>
-          )}
+          {error && <p className="text-sm text-red-400">{error}</p>}
 
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button
+            type="submit"
+            className="h-12 w-full text-base"
+            disabled={loading}
+          >
             {loading ? (
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2 className="animate-spin" size={18} />
             ) : (
               "Sign In"
             )}

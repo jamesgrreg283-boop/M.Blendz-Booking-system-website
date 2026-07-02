@@ -8,6 +8,7 @@ import {
   LogOut,
   RefreshCw,
   Ban,
+  List,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BUSINESS_NAME } from "@/lib/constants";
@@ -18,11 +19,17 @@ import { cn } from "@/lib/utils";
 
 type Tab = "bookings" | "manual" | "blocks";
 
-const TABS: { id: Tab; label: string; icon: typeof CalendarPlus }[] = [
-  { id: "bookings", label: "Bookings", icon: CalendarPlus },
-  { id: "manual", label: "Add Booking", icon: CalendarPlus },
-  { id: "blocks", label: "Block Time", icon: Ban },
-];
+const TABS: { id: Tab; label: string; shortLabel: string; icon: typeof List }[] =
+  [
+    { id: "bookings", label: "Bookings", shortLabel: "Bookings", icon: List },
+    {
+      id: "manual",
+      label: "Add Booking",
+      shortLabel: "Add",
+      icon: CalendarPlus,
+    },
+    { id: "blocks", label: "Block Time", shortLabel: "Block", icon: Ban },
+  ];
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -40,52 +47,75 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="container-narrow mx-auto flex h-16 items-center justify-between px-5 md:px-8">
-          <div className="flex items-center gap-4">
-            <Button asChild variant="ghost" size="icon">
-              <Link href="/">
+    <div className="min-h-[100dvh] bg-background pb-safe">
+      <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 sm:h-16 sm:px-5 md:px-8">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="shrink-0 touch-target"
+            >
+              <Link href="/" aria-label="Back to site">
                 <ArrowLeft size={20} />
               </Link>
             </Button>
-            <div>
-              <h1 className="text-lg font-semibold">Admin</h1>
-              <p className="text-xs text-muted-foreground">{BUSINESS_NAME}</p>
+            <div className="min-w-0">
+              <h1 className="truncate text-base font-semibold sm:text-lg">
+                Admin
+              </h1>
+              <p className="truncate text-xs text-muted-foreground">
+                {BUSINESS_NAME}
+              </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleRefresh}>
-              <RefreshCw size={14} />
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleRefresh}
+              className="touch-target sm:h-9 sm:w-auto sm:px-4"
+              aria-label="Refresh"
+            >
+              <RefreshCw size={16} />
               <span className="hidden sm:inline">Refresh</span>
             </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout}>
-              <LogOut size={14} />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              className="touch-target sm:h-9 sm:w-auto sm:px-4"
+              aria-label="Logout"
+            >
+              <LogOut size={16} />
               <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
 
-        <nav className="container-narrow mx-auto flex gap-1 overflow-x-auto px-5 pb-3 md:px-8">
+        <nav className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] sm:px-5 md:px-8 [&::-webkit-scrollbar]:hidden">
           {TABS.map((t) => (
             <button
               key={t.id}
+              type="button"
               onClick={() => setTab(t.id)}
               className={cn(
-                "flex items-center gap-2 whitespace-nowrap rounded-sm px-4 py-2 text-sm transition-colors",
+                "flex min-h-11 min-w-[33%] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-2.5 text-sm transition-colors sm:min-w-0 sm:flex-none sm:px-4",
                 tab === t.id
                   ? "bg-primary text-primary-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  : "bg-muted/50 text-muted-foreground active:bg-muted"
               )}
             >
-              <t.icon size={14} />
-              {t.label}
+              <t.icon size={15} className="shrink-0" />
+              <span className="sm:hidden">{t.shortLabel}</span>
+              <span className="hidden sm:inline">{t.label}</span>
             </button>
           ))}
         </nav>
       </header>
 
-      <main className="container-narrow mx-auto px-5 py-8 md:px-8">
+      <main className="mx-auto max-w-6xl px-4 py-5 sm:px-5 sm:py-8 md:px-8">
         {tab === "bookings" && <AdminBookings key={refreshKey} />}
         {tab === "manual" && (
           <AdminManualBooking

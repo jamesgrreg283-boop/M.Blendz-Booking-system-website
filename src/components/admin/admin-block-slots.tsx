@@ -114,14 +114,14 @@ export function AdminBlockSlots({ onChanged }: AdminBlockSlotsProps) {
           time.
         </p>
 
-        <div className="mb-6 grid gap-2 sm:grid-cols-3">
+        <div className="mb-6 grid grid-cols-1 gap-2 sm:grid-cols-3">
           {blockTypes.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => setBlockType(t.id)}
               className={cn(
-                "border p-3 text-left text-sm transition-colors",
+                "min-h-14 border p-3 text-left text-sm transition-colors active:scale-[0.99] sm:min-h-0",
                 blockType === t.id
                   ? "border-primary bg-primary/5"
                   : "border-border hover:border-primary/30"
@@ -139,7 +139,7 @@ export function AdminBlockSlots({ onChanged }: AdminBlockSlotsProps) {
             <select
               value={form.barber}
               onChange={(e) => setForm({ ...form, barber: e.target.value })}
-              className="flex h-11 w-full rounded-sm border border-input bg-card px-4 text-sm"
+              className="flex h-12 w-full rounded-sm border border-input bg-card px-4 text-base sm:text-sm"
             >
               <option value="*">All barbers</option>
               {BARBERS.map((b) => (
@@ -216,7 +216,7 @@ export function AdminBlockSlots({ onChanged }: AdminBlockSlotsProps) {
 
           {error && <p className="text-sm text-red-400">{error}</p>}
 
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" disabled={submitting} className="h-12 w-full sm:w-auto">
             {submitting ? (
               <Loader2 className="animate-spin" size={16} />
             ) : (
@@ -272,7 +272,8 @@ export function AdminBlockSlots({ onChanged }: AdminBlockSlotsProps) {
                   variant="ghost"
                   size="icon"
                   onClick={() => handleDelete(b.id)}
-                  className="shrink-0 text-red-400 hover:text-red-300"
+                  className="touch-target shrink-0 text-red-400 hover:text-red-300"
+                  aria-label="Remove block"
                 >
                   <Trash2 size={16} />
                 </Button>

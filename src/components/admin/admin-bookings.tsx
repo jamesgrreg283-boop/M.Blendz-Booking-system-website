@@ -123,7 +123,7 @@ function BookingSection({
 }) {
   return (
     <section>
-      <h2 className="mb-4 text-xl font-semibold">{title}</h2>
+      <h2 className="mb-3 text-lg font-semibold sm:mb-4 sm:text-xl">{title}</h2>
       {bookings.length === 0 ? (
         <p className="text-muted-foreground">{emptyMessage}</p>
       ) : (
@@ -157,14 +157,14 @@ function BookingCard({
   return (
     <div
       className={cn(
-        "border border-border bg-card p-4 md:p-5",
+        "border border-border bg-card p-4 sm:p-5",
         muted && "opacity-60"
       )}
     >
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="space-y-1">
+      <div className="flex flex-col gap-4">
+        <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="font-semibold text-foreground">
+            <p className="text-base font-semibold text-foreground">
               {booking.customer_name}
             </p>
             <span
@@ -196,7 +196,7 @@ function BookingCard({
           </p>
           <a
             href={`tel:${booking.phone}`}
-            className="text-sm text-primary hover:underline"
+            className="inline-flex min-h-11 items-center text-base font-medium text-primary active:opacity-80"
           >
             {booking.phone}
           </a>
@@ -213,13 +213,14 @@ function BookingCard({
         {!muted &&
           booking.status !== "cancelled" &&
           booking.status !== "completed" && (
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-2 gap-2 border-t border-border pt-4 sm:flex sm:flex-wrap">
               {booking.status === "pending" && (
                 <Button
-                  size="sm"
+                  size="lg"
                   variant="outline"
                   disabled={updating}
                   onClick={() => onUpdateStatus(booking.id, "confirmed")}
+                  className="h-11 w-full sm:h-9 sm:w-auto"
                 >
                   Confirm
                 </Button>
@@ -227,19 +228,20 @@ function BookingCard({
               {(booking.status === "pending" ||
                 booking.status === "confirmed") && (
                 <Button
-                  size="sm"
+                  size="lg"
                   disabled={updating}
                   onClick={() => onUpdateStatus(booking.id, "completed")}
+                  className="h-11 w-full sm:h-9 sm:w-auto"
                 >
                   Complete
                 </Button>
               )}
               <Button
-                size="sm"
+                size="lg"
                 variant="ghost"
                 disabled={updating}
                 onClick={() => onUpdateStatus(booking.id, "cancelled")}
-                className="text-red-400 hover:text-red-300"
+                className="col-span-2 h-11 w-full text-red-400 hover:text-red-300 sm:col-span-1 sm:h-9 sm:w-auto"
               >
                 Cancel
               </Button>
