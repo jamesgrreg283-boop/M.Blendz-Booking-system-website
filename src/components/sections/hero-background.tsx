@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useReducedMotion } from "framer-motion";
 import { HERO_IMAGE } from "@/lib/constants";
 
@@ -9,15 +8,11 @@ export function HeroBackground() {
 
   return (
     <div className="absolute inset-0 overflow-hidden bg-background">
-      <Image
-        src={HERO_IMAGE}
-        alt=""
-        fill
-        priority
-        className={`object-cover object-center ${
-          reduceMotion ? "" : "animate-ken-burns-slow scale-105"
+      <div
+        className={`absolute inset-0 bg-cover bg-center bg-no-repeat ${
+          reduceMotion ? "" : "animate-ken-burns-slow"
         }`}
-        sizes="100vw"
+        style={{ backgroundImage: `url(${HERO_IMAGE})` }}
         aria-hidden="true"
       />
     </div>
