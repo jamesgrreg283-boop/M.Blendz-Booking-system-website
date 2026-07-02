@@ -14,7 +14,7 @@ export function HeroBackground() {
         alt=""
         fill
         priority
-        className={`object-cover object-center brightness-[0.5] ${
+        className={`object-cover object-center ${
           reduceMotion ? "" : "animate-ken-burns-slow scale-105"
         }`}
         sizes="100vw"

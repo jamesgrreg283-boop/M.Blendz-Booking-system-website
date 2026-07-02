@@ -22,8 +22,8 @@ export function Hero() {
   return (
     <section className="relative flex min-h-[100dvh] items-center justify-center overflow-hidden">
       <HeroBackground />
-      <div className="absolute inset-0 bg-gradient-to-b from-background/90 via-background/75 to-background" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-background/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/55 to-background/10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/80" />
       <FilmGrain />
 
       <div className="container-narrow relative z-10 px-5 pt-24 pb-32 md:px-8">

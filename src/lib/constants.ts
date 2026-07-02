@@ -99,9 +99,9 @@ export const GALLERY_IMAGES = [
   },
 ];
 
-// Premium barber shop interior — hero only (gallery/about use real client photos)
+// Bright barber-at-work shot — hero only (gallery/about use real client photos)
 export const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1622286342621-4bd786c2447c?w=1920&q=85";
+  "https://images.unsplash.com/photo-1503951914875-452162b0f3d1?w=1920&q=85";
 export const ABOUT_IMAGE = "/gallery/hair-design-fade.png";
 
 export function getServiceById(id: string): Service | undefined {
