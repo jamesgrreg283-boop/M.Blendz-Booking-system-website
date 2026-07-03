@@ -16,7 +16,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { SERVICES, BARBERS, BOOKING_POLICY } from "@/lib/constants";
+import { BARBERS, BOOKING_POLICY } from "@/lib/constants";
+import { useServices } from "@/hooks/use-services";
 import {
   getNextAvailableDates,
   formatDisplayDate,
@@ -56,6 +57,7 @@ const initialForm: BookingFormData = {
 };
 
 export function Booking() {
+  const { services, loading: loadingServices } = useServices();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<BookingFormData>(initialForm);
   const [slots, setSlots] = useState<string[]>([]);
@@ -138,7 +140,7 @@ export function Booking() {
     }
   };
 
-  const selectedService = SERVICES.find((s) => s.id === form.service);
+  const selectedService = services.find((s) => s.id === form.service);
   const selectedBarber = BARBERS.find((b) => b.id === form.barber);
 
   if (confirmed) {
@@ -243,29 +245,35 @@ export function Booking() {
                 {step === 1 && (
                   <div className="space-y-3">
                     <h3 className="text-lg font-semibold">Choose a service</h3>
-                    {SERVICES.map((service) => (
-                      <button
-                        key={service.id}
-                        type="button"
-                        onClick={() => updateForm({ service: service.id })}
-                        className={cn(
-                          "flex w-full items-center justify-between border p-4 text-left transition-all active:scale-[0.99] hover:border-primary/50 min-h-[3.25rem]",
-                          form.service === service.id
-                            ? "border-primary bg-primary/5"
-                            : "border-border"
-                        )}
-                      >
-                        <div>
-                          <p className="font-medium">{service.name}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {service.duration} min
-                          </p>
-                        </div>
-                        <span className="font-semibold text-primary">
-                          £{service.price}
-                        </span>
-                      </button>
-                    ))}
+                    {loadingServices ? (
+                      <div className="flex justify-center py-8">
+                        <Loader2 className="animate-spin text-primary" size={24} />
+                      </div>
+                    ) : (
+                      services.map((service) => (
+                        <button
+                          key={service.id}
+                          type="button"
+                          onClick={() => updateForm({ service: service.id })}
+                          className={cn(
+                            "flex w-full items-center justify-between border p-4 text-left transition-all active:scale-[0.99] hover:border-primary/50 min-h-[3.25rem]",
+                            form.service === service.id
+                              ? "border-primary bg-primary/5"
+                              : "border-border"
+                          )}
+                        >
+                          <div>
+                            <p className="font-medium">{service.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {service.duration} min
+                            </p>
+                          </div>
+                          <span className="font-semibold text-primary">
+                            £{service.price}
+                          </span>
+                        </button>
+                      ))
+                    )}
                   </div>
                 )}
 

@@ -4,39 +4,62 @@ import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
+  Ban,
+  Calendar,
   CalendarPlus,
+  LayoutDashboard,
+  List,
   LogOut,
   RefreshCw,
-  Ban,
-  List,
+  Scissors,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BUSINESS_NAME } from "@/lib/constants";
 import { AdminBookings } from "./admin-bookings";
 import { AdminManualBooking } from "./admin-manual-booking";
 import { AdminBlockSlots } from "./admin-block-slots";
+import { AdminOverview } from "./admin-overview";
+import { AdminCalendar } from "./admin-calendar";
+import { AdminCustomers } from "./admin-customers";
+import { AdminServices } from "./admin-services";
 import { cn } from "@/lib/utils";
 
-type Tab = "bookings" | "manual" | "blocks";
+type Tab =
+  | "overview"
+  | "calendar"
+  | "bookings"
+  | "customers"
+  | "manual"
+  | "blocks"
+  | "services";
 
-const TABS: { id: Tab; label: string; shortLabel: string; icon: typeof List }[] =
-  [
-    { id: "bookings", label: "Bookings", shortLabel: "Bookings", icon: List },
-    {
-      id: "manual",
-      label: "Add Booking",
-      shortLabel: "Add",
-      icon: CalendarPlus,
-    },
-    { id: "blocks", label: "Block Time", shortLabel: "Block", icon: Ban },
-  ];
+const TABS: {
+  id: Tab;
+  label: string;
+  shortLabel: string;
+  icon: typeof List;
+}[] = [
+  { id: "overview", label: "Dashboard", shortLabel: "Home", icon: LayoutDashboard },
+  { id: "calendar", label: "Calendar", shortLabel: "Cal", icon: Calendar },
+  { id: "bookings", label: "Bookings", shortLabel: "Book", icon: List },
+  { id: "customers", label: "Customers", shortLabel: "Clients", icon: Users },
+  {
+    id: "manual",
+    label: "Add Booking",
+    shortLabel: "Add",
+    icon: CalendarPlus,
+  },
+  { id: "blocks", label: "Block Time", shortLabel: "Block", icon: Ban },
+  { id: "services", label: "Services", shortLabel: "Svc", icon: Scissors },
+];
 
 interface AdminDashboardProps {
   onLogout: () => void;
 }
 
 export function AdminDashboard({ onLogout }: AdminDashboardProps) {
-  const [tab, setTab] = useState<Tab>("bookings");
+  const [tab, setTab] = useState<Tab>("overview");
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleRefresh = () => setRefreshKey((k) => k + 1);
@@ -101,7 +124,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
               type="button"
               onClick={() => setTab(t.id)}
               className={cn(
-                "flex min-h-11 min-w-[33%] flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-2.5 text-sm transition-colors sm:min-w-0 sm:flex-none sm:px-4",
+                "flex min-h-11 shrink-0 items-center justify-center gap-1.5 whitespace-nowrap rounded-sm px-3 py-2.5 text-sm transition-colors sm:px-4",
                 tab === t.id
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted/50 text-muted-foreground active:bg-muted"
@@ -116,7 +139,12 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-5 sm:px-5 sm:py-8 md:px-8">
+        {tab === "overview" && <AdminOverview key={refreshKey} />}
+        {tab === "calendar" && (
+          <AdminCalendar key={refreshKey} onChanged={handleRefresh} />
+        )}
         {tab === "bookings" && <AdminBookings key={refreshKey} />}
+        {tab === "customers" && <AdminCustomers key={refreshKey} />}
         {tab === "manual" && (
           <AdminManualBooking
             key={refreshKey}
@@ -129,6 +157,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
         {tab === "blocks" && (
           <AdminBlockSlots key={refreshKey} onChanged={handleRefresh} />
         )}
+        {tab === "services" && <AdminServices key={refreshKey} />}
       </main>
     </div>
   );

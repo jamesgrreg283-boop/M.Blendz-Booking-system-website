@@ -1,4 +1,4 @@
-import { OPENING_HOURS, SLOT_INTERVAL_MINUTES, getServiceById } from "@/lib/constants";
+import { OPENING_HOURS, SLOT_INTERVAL_MINUTES } from "@/lib/constants";
 import type { BlockedSlot } from "@/types/booking";
 
 const DAY_NAMES = [
@@ -181,18 +181,15 @@ export function getBlockedTimesForDate(
 }
 
 export function canBookServiceAtTime(
-  serviceId: string,
+  durationMinutes: number,
   startTime: string,
   date: string,
   barber: string,
   bookedSlots: string[],
   blocked: BlockedSlot[]
 ): boolean {
-  const service = getServiceById(serviceId);
-  if (!service) return false;
-
   const allSlots = getAvailableSlots(date);
-  const needed = getSlotsNeeded(service.duration);
+  const needed = getSlotsNeeded(durationMinutes);
   const consecutive = getConsecutiveSlots(startTime, needed, allSlots);
 
   if (consecutive.length < needed) return false;
@@ -205,14 +202,11 @@ export function canBookServiceAtTime(
 }
 
 export function getOccupiedSlotsForBooking(
-  serviceId: string,
+  durationMinutes: number,
   startTime: string,
   date: string
 ): string[] {
-  const service = getServiceById(serviceId);
-  if (!service) return [startTime];
-
   const allSlots = getAvailableSlots(date);
-  const needed = getSlotsNeeded(service.duration);
+  const needed = getSlotsNeeded(durationMinutes);
   return getConsecutiveSlots(startTime, needed, allSlots);
 }

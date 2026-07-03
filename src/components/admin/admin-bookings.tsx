@@ -3,26 +3,25 @@
 import { useEffect, useState, useCallback } from "react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SERVICES, BARBERS } from "@/lib/constants";
+import { BARBERS } from "@/lib/constants";
 import {
   formatDisplayDate,
   formatDisplayTime,
   isToday,
 } from "@/lib/booking-utils";
 import type { Booking, BookingStatus } from "@/types/booking";
+import { useServices } from "@/hooks/use-services";
 import { cn } from "@/lib/utils";
+import { STATUS_STYLES } from "./admin-shared";
 
-const STATUS_STYLES: Record<BookingStatus, string> = {
-  pending: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-  confirmed: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  completed: "bg-green-500/10 text-green-400 border-green-500/20",
-  cancelled: "bg-red-500/10 text-red-400 border-red-500/20",
-};
+type ListFilter = "active" | "no_shows";
 
 export function AdminBookings() {
+  const { services } = useServices(true);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [filter, setFilter] = useState<ListFilter>("active");
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);
@@ -57,15 +56,30 @@ export function AdminBookings() {
     }
   };
 
+  const serviceName = (id: string) =>
+    services.find((s) => s.id === id)?.name ?? id;
+  const barberName = (id: string) =>
+    BARBERS.find((b) => b.id === id)?.name ?? id;
+
   const today = new Date().toISOString().split("T")[0];
   const todaysBookings = bookings.filter(
-    (b) => b.date === today && b.status !== "cancelled"
+    (b) =>
+      b.date === today &&
+      b.status !== "cancelled" &&
+      b.status !== "no_show"
   );
   const upcomingBookings = bookings.filter(
-    (b) => b.date > today && b.status !== "cancelled"
+    (b) =>
+      b.date > today &&
+      b.status !== "cancelled" &&
+      b.status !== "no_show"
   );
+  const noShowBookings = bookings.filter((b) => b.status === "no_show");
   const pastBookings = bookings.filter(
-    (b) => b.date < today || b.status === "cancelled"
+    (b) =>
+      b.date < today ||
+      b.status === "cancelled" ||
+      b.status === "completed"
   );
 
   if (loading) {
@@ -76,14 +90,53 @@ export function AdminBookings() {
     );
   }
 
+  if (filter === "no_shows") {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-xl font-semibold">No-shows</h2>
+          <Button variant="outline" size="sm" onClick={() => setFilter("active")}>
+            Back to bookings
+          </Button>
+        </div>
+        <BookingSection
+          title="No-show bookings"
+          bookings={noShowBookings}
+          emptyMessage="No no-shows recorded."
+          updating={updating}
+          onUpdateStatus={updateStatus}
+          serviceName={serviceName}
+          barberName={barberName}
+          muted
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-10">
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-xl font-semibold">Bookings</h2>
+        {noShowBookings.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setFilter("no_shows")}
+            className="text-orange-400"
+          >
+            No-shows ({noShowBookings.length})
+          </Button>
+        )}
+      </div>
+
       <BookingSection
         title="Today's Bookings"
         bookings={todaysBookings}
         emptyMessage="No bookings for today."
         updating={updating}
         onUpdateStatus={updateStatus}
+        serviceName={serviceName}
+        barberName={barberName}
       />
       <BookingSection
         title="Upcoming Bookings"
@@ -91,14 +144,18 @@ export function AdminBookings() {
         emptyMessage="No upcoming bookings."
         updating={updating}
         onUpdateStatus={updateStatus}
+        serviceName={serviceName}
+        barberName={barberName}
       />
       {pastBookings.length > 0 && (
         <BookingSection
-          title="Past & Cancelled"
+          title="Past & Completed"
           bookings={pastBookings.slice(-10).reverse()}
           emptyMessage=""
           updating={updating}
           onUpdateStatus={updateStatus}
+          serviceName={serviceName}
+          barberName={barberName}
           muted
         />
       )}
@@ -112,6 +169,8 @@ function BookingSection({
   emptyMessage,
   updating,
   onUpdateStatus,
+  serviceName,
+  barberName,
   muted,
 }: {
   title: string;
@@ -119,6 +178,8 @@ function BookingSection({
   emptyMessage: string;
   updating: string | null;
   onUpdateStatus: (id: string, status: BookingStatus) => void;
+  serviceName: (id: string) => string;
+  barberName: (id: string) => string;
   muted?: boolean;
 }) {
   return (
@@ -134,6 +195,8 @@ function BookingSection({
               booking={booking}
               updating={updating === booking.id}
               onUpdateStatus={onUpdateStatus}
+              serviceName={serviceName}
+              barberName={barberName}
               muted={muted}
             />
           ))}
@@ -147,13 +210,23 @@ function BookingCard({
   booking,
   updating,
   onUpdateStatus,
+  serviceName,
+  barberName,
   muted,
 }: {
   booking: Booking;
   updating: boolean;
   onUpdateStatus: (id: string, status: BookingStatus) => void;
+  serviceName: (id: string) => string;
+  barberName: (id: string) => string;
   muted?: boolean;
 }) {
+  const canAct =
+    !muted &&
+    booking.status !== "cancelled" &&
+    booking.status !== "completed" &&
+    booking.status !== "no_show";
+
   return (
     <div
       className={cn(
@@ -173,7 +246,7 @@ function BookingCard({
                 STATUS_STYLES[booking.status]
               )}
             >
-              {booking.status}
+              {booking.status.replace("_", " ")}
             </span>
             {booking.source === "manual" && (
               <span className="rounded-sm bg-muted px-2 py-0.5 text-xs text-muted-foreground">
@@ -182,11 +255,7 @@ function BookingCard({
             )}
           </div>
           <p className="text-sm text-muted-foreground">
-            {SERVICES.find((s) => s.id === booking.service)?.name ??
-              booking.service}{" "}
-            &middot;{" "}
-            {BARBERS.find((b) => b.id === booking.barber)?.name ??
-              booking.barber}
+            {serviceName(booking.service)} &middot; {barberName(booking.barber)}
           </p>
           <p className="text-sm">
             {isToday(booking.date)
@@ -210,43 +279,53 @@ function BookingCard({
           )}
         </div>
 
-        {!muted &&
-          booking.status !== "cancelled" &&
-          booking.status !== "completed" && (
-            <div className="grid grid-cols-2 gap-2 border-t border-border pt-4 sm:flex sm:flex-wrap">
-              {booking.status === "pending" && (
-                <Button
-                  size="lg"
-                  variant="outline"
-                  disabled={updating}
-                  onClick={() => onUpdateStatus(booking.id, "confirmed")}
-                  className="h-11 w-full sm:h-9 sm:w-auto"
-                >
-                  Confirm
-                </Button>
-              )}
-              {(booking.status === "pending" ||
-                booking.status === "confirmed") && (
-                <Button
-                  size="lg"
-                  disabled={updating}
-                  onClick={() => onUpdateStatus(booking.id, "completed")}
-                  className="h-11 w-full sm:h-9 sm:w-auto"
-                >
-                  Complete
-                </Button>
-              )}
+        {canAct && (
+          <div className="grid grid-cols-2 gap-2 border-t border-border pt-4">
+            {booking.status === "pending" && (
               <Button
                 size="lg"
-                variant="ghost"
+                variant="outline"
                 disabled={updating}
-                onClick={() => onUpdateStatus(booking.id, "cancelled")}
-                className="col-span-2 h-11 w-full text-red-400 hover:text-red-300 sm:col-span-1 sm:h-9 sm:w-auto"
+                onClick={() => onUpdateStatus(booking.id, "confirmed")}
+                className="h-11 w-full sm:h-9"
               >
-                Cancel
+                Confirm
               </Button>
-            </div>
-          )}
+            )}
+            {(booking.status === "pending" ||
+              booking.status === "confirmed") && (
+              <Button
+                size="lg"
+                disabled={updating}
+                onClick={() => onUpdateStatus(booking.id, "completed")}
+                className="h-11 w-full sm:h-9"
+              >
+                Complete
+              </Button>
+            )}
+            {(booking.status === "pending" ||
+              booking.status === "confirmed") && (
+              <Button
+                size="lg"
+                variant="outline"
+                disabled={updating}
+                onClick={() => onUpdateStatus(booking.id, "no_show")}
+                className="h-11 w-full text-orange-400 sm:h-9"
+              >
+                No-show
+              </Button>
+            )}
+            <Button
+              size="lg"
+              variant="ghost"
+              disabled={updating}
+              onClick={() => onUpdateStatus(booking.id, "cancelled")}
+              className="col-span-2 h-11 w-full text-red-400 hover:text-red-300 sm:col-span-1 sm:h-9"
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

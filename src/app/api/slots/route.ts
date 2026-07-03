@@ -8,7 +8,6 @@ import {
   isDateFullyBlocked,
   isShopOpenOnDate,
 } from "@/lib/booking-utils";
-import { getServiceById } from "@/lib/constants";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -49,8 +48,8 @@ export async function GET(request: Request) {
     let slots = availableSlots.filter((s) => !unavailable.has(s));
 
     if (serviceId) {
-      const service = getServiceById(serviceId);
-      if (service) {
+      const service = await store.getServiceById(serviceId);
+      if (service?.active) {
         const needed = getSlotsNeeded(service.duration);
         slots = slots.filter((startSlot) => {
           const startIndex = availableSlots.indexOf(startSlot);

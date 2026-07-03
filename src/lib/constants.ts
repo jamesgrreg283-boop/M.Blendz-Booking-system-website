@@ -1,38 +1,7 @@
-import type { Barber, OpeningHours, Service } from "@/types/booking";
+import type { Barber, OpeningHours } from "@/types/booking";
 
 export const BUSINESS_NAME = "M.Blendz";
 export const BUSINESS_TAGLINE = "Haircuts and smooth fades";
-
-export const SERVICES: Service[] = [
-  {
-    id: "haircut-18",
-    name: "Haircut (18+)",
-    price: 25,
-    duration: 45,
-    category: "Main Services",
-  },
-  {
-    id: "haircut-beard",
-    name: "Haircut & Beard",
-    price: 30,
-    duration: 50,
-    category: "Main Services",
-  },
-  {
-    id: "shape-up",
-    name: "Shape Up",
-    price: 15,
-    duration: 20,
-    category: "Additional Services",
-  },
-  {
-    id: "haircut-under-18",
-    name: "Haircut (under 18s)",
-    price: 20,
-    duration: 40,
-    category: "Other",
-  },
-];
 
 export const BARBERS: Barber[] = [
   { id: "m-blendz", name: "M.Blendz", role: "Barber" },
@@ -103,10 +72,10 @@ export const GALLERY_IMAGES = [
 export const HERO_IMAGE = "/hero-bg.jpg";
 export const ABOUT_IMAGE = "/gallery/hair-design-fade.png";
 
-export function getServiceById(id: string): Service | undefined {
-  return SERVICES.find((s) => s.id === id);
-}
-
-export function getServiceCategories(): string[] {
-  return [...new Set(SERVICES.map((s) => s.category).filter(Boolean))] as string[];
+export function getServiceCategories(
+  services: { category?: string }[]
+): string[] {
+  return [
+    ...new Set(services.map((s) => s.category).filter(Boolean)),
+  ] as string[];
 }

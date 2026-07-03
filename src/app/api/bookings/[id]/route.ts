@@ -16,7 +16,7 @@ export async function PATCH(
     const body = await request.json();
     const status = body.status as BookingStatus;
 
-    if (!["confirmed", "completed", "cancelled"].includes(status)) {
+    if (!["confirmed", "completed", "cancelled", "no_show"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
 

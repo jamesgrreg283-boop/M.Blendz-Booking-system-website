@@ -1,15 +1,17 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SERVICES, BARBERS } from "@/lib/constants";
+import { BARBERS } from "@/lib/constants";
 import {
   formatDisplayTime,
   getNextAvailableDates,
 } from "@/lib/booking-utils";
+import { useServices } from "@/hooks/use-services";
+import type { CustomerWithStats } from "@/lib/customer-utils";
 import { cn } from "@/lib/utils";
 
 interface AdminManualBookingProps {
@@ -17,11 +19,12 @@ interface AdminManualBookingProps {
 }
 
 export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
+  const { services, loading: loadingServices } = useServices(true);
   const [form, setForm] = useState({
     customer_name: "",
     phone: "",
     email: "",
-    service: SERVICES[0].id,
+    service: "",
     barber: BARBERS[0].id,
     date: "",
     time: "",
@@ -33,8 +36,44 @@ export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [customerWarning, setCustomerWarning] =
+    useState<CustomerWithStats | null>(null);
 
+  const activeServices = services.filter((s) => s.active);
   const dates = getNextAvailableDates(30);
+
+  useEffect(() => {
+    if (activeServices.length && !form.service) {
+      setForm((f) => ({ ...f, service: activeServices[0].id }));
+    }
+  }, [activeServices, form.service]);
+
+  const checkCustomer = useCallback(async (phone: string) => {
+    if (phone.length < 6) {
+      setCustomerWarning(null);
+      return;
+    }
+    try {
+      const res = await fetch(
+        `/api/admin/customers?phone=${encodeURIComponent(phone)}`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setCustomerWarning(data.is_repeat_offender ? data : null);
+      } else {
+        setCustomerWarning(null);
+      }
+    } catch {
+      setCustomerWarning(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (form.phone) checkCustomer(form.phone);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [form.phone, checkCustomer]);
 
   const fetchSlots = useCallback(async () => {
     if (!form.barber || !form.date || !form.service) return;
@@ -70,17 +109,19 @@ export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
       if (!res.ok) throw new Error(data.error || "Failed to create booking");
 
       setSuccess(true);
+      const defaultService = activeServices[0]?.id ?? "";
       setForm({
         customer_name: "",
         phone: "",
         email: "",
-        service: SERVICES[0].id,
+        service: defaultService,
         barber: BARBERS[0].id,
         date: "",
         time: "",
         notes: "",
         status: "confirmed",
       });
+      setCustomerWarning(null);
       onCreated();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -89,12 +130,30 @@ export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
     }
   };
 
+  if (loadingServices) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="animate-spin text-primary" size={32} />
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-xl">
       <h2 className="mb-2 text-xl font-semibold">Add Manual Booking</h2>
       <p className="mb-6 text-sm text-muted-foreground">
         Walk-ins, phone bookings, or appointments added on behalf of a client.
       </p>
+
+      {customerWarning && (
+        <div className="mb-5 flex items-start gap-2 border border-orange-500/30 bg-orange-500/10 p-4 text-sm text-orange-300">
+          <AlertTriangle size={18} className="mt-0.5 shrink-0" />
+          <span>
+            Warning: this customer has {customerWarning.no_show_count} previous
+            no-shows.
+          </span>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -133,7 +192,7 @@ export function AdminManualBooking({ onCreated }: AdminManualBookingProps) {
         <div className="space-y-2">
           <Label>Service</Label>
           <div className="space-y-2">
-            {SERVICES.map((s) => (
+            {activeServices.map((s) => (
               <button
                 key={s.id}
                 type="button"

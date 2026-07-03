@@ -1,4 +1,9 @@
-export type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled";
+export type BookingStatus =
+  | "pending"
+  | "confirmed"
+  | "completed"
+  | "cancelled"
+  | "no_show";
 
 export interface Booking {
   id: string;
@@ -48,6 +53,62 @@ export interface BlockedSlotInput {
   reason?: string;
 }
 
+export interface ServiceRecord {
+  id: string;
+  name: string;
+  price: number;
+  duration: number;
+  description?: string;
+  category?: string;
+  active: boolean;
+  barber_ids: string[];
+  sort_order: number;
+  created_at: string;
+}
+
+export interface ServiceInput {
+  id?: string;
+  name: string;
+  price: number;
+  duration: number;
+  description?: string;
+  category?: string;
+  active?: boolean;
+  barber_ids?: string[];
+  sort_order?: number;
+}
+
+export interface CustomerRecord {
+  id: string;
+  phone: string;
+  name: string;
+  email?: string;
+  notes?: string;
+  favourite_barber?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CustomerInput {
+  phone: string;
+  name: string;
+  email?: string;
+  notes?: string;
+  favourite_barber?: string;
+}
+
+export interface DashboardStats {
+  earned_today: number;
+  earned_this_week: number;
+  earned_this_month: number;
+  average_booking_value: number;
+  completed_bookings: number;
+  upcoming_bookings: number;
+  cancellations: number;
+  no_shows: number;
+}
+
+/** @deprecated Use ServiceRecord from API */
 export interface Service {
   id: string;
   name: string;

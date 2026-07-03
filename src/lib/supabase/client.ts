@@ -5,7 +5,13 @@ import type {
   Booking,
   BookingInput,
   BookingStatus,
+  CustomerInput,
+  CustomerRecord,
+  DashboardStats,
+  ServiceInput,
+  ServiceRecord,
 } from "@/types/booking";
+import type { CustomerWithStats } from "@/lib/customer-utils";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -23,7 +29,7 @@ export function createSupabaseServerClient(): SupabaseClient | null {
   return createClient(supabaseUrl, serviceKey);
 }
 
-export interface BookingStore {
+export interface AppStore {
   create(input: BookingInput): Promise<Booking>;
   getAll(): Promise<Booking[]>;
   getById(id: string): Promise<Booking | null>;
@@ -38,4 +44,26 @@ export interface BookingStore {
   getBlockedSlots(): Promise<BlockedSlot[]>;
   createBlockedSlot(input: BlockedSlotInput): Promise<BlockedSlot>;
   deleteBlockedSlot(id: string): Promise<boolean>;
+
+  getServices(activeOnly?: boolean): Promise<ServiceRecord[]>;
+  getServiceById(id: string): Promise<ServiceRecord | null>;
+  createService(input: ServiceInput): Promise<ServiceRecord>;
+  updateService(
+    id: string,
+    input: Partial<ServiceInput>
+  ): Promise<ServiceRecord | null>;
+  deleteService(id: string): Promise<boolean>;
+
+  getCustomers(): Promise<CustomerWithStats[]>;
+  getCustomerByPhone(phone: string): Promise<CustomerWithStats | null>;
+  upsertCustomer(input: CustomerInput): Promise<CustomerRecord>;
+  updateCustomer(
+    id: string,
+    input: Partial<CustomerInput>
+  ): Promise<CustomerRecord | null>;
+
+  getDashboardStats(): Promise<DashboardStats>;
 }
+
+/** @deprecated Use AppStore */
+export type BookingStore = AppStore;
